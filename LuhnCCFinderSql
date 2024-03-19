@@ -19,3 +19,54 @@ FROM
     YourTableName
 CROSS JOIN
     (SELECT TOP 16 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS number FROM master.dbo.spt_values) AS Numbers;
+
+
+
+
+
+using System;
+using System.Data;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        // Assuming you have already populated your DataTable
+        DataTable dataTable = new DataTable();
+        dataTable.Columns.Add("col1", typeof(int)); // Example column
+        dataTable.Columns.Add("col2", typeof(bool)); // Example column
+
+        // Populate your DataTable with data, such as from a database query
+
+        // Update col2 based on the result of your C# function applied to col1
+        UpdateCol2(dataTable);
+
+        // Now, your DataTable has col2 updated based on the result of your C# function applied to col1
+    }
+
+    static void UpdateCol2(DataTable dataTable)
+    {
+        // Use LINQ to iterate through rows matching your criteria
+        var rowsToUpdate = dataTable.Select().OfType<DataRow>()
+            .Select(row => new
+            {
+                Row = row,
+                Col1Value = (int)row["col1"],
+                Result = YourCSharpFunction((int)row["col1"]) // Call your C# function here
+            });
+
+        // Update col2 based on the result
+        foreach (var item in rowsToUpdate)
+        {
+            item.Row["col2"] = item.Result;
+        }
+    }
+
+    static bool YourCSharpFunction(int input)
+    {
+        // Implement your C# function logic here
+        // This function should return true or false based on the input
+        return true; // Placeholder return value
+    }
+}
