@@ -8,13 +8,13 @@ SELECT
                 WHEN 
                     (
                         (SUM(SUBSTRING(REVERSE(CreditCardNumber), 1, 1)) +
-                        SUM(CASE WHEN (LEN(CreditCardNumber) % 2 = 0 AND (LEN(CreditCardNumber) - 1) - number BETWEEN 0 AND LEN(CreditCardNumber) - 2) 
-                                 OR (LEN(CreditCardNumber) % 2 != 0 AND (LEN(CreditCardNumber) - 1) - number BETWEEN 0 AND LEN(CreditCardNumber) - 2) 
+                        SUM(CASE WHEN (LEN(CreditCardNumber) % 2 = 0 AND (LEN(CreditCardNumber) - 1 - number) BETWEEN 0 AND LEN(CreditCardNumber) - 2) 
+                                 OR (LEN(CreditCardNumber) % 2 != 0 AND (LEN(CreditCardNumber) - 1 - number) BETWEEN 0 AND LEN(CreditCardNumber) - 2) 
                             THEN 
-                                CASE WHEN (2 * CAST(SUBSTRING(CreditCardNumber, number, 1) AS INT)) > 9 THEN (2 * CAST(SUBSTRING(CreditCardNumber, number, 1) AS INT)) - 9
-                                     ELSE (2 * CAST(SUBSTRING(CreditCardNumber, number, 1) AS INT)) END
+                                CASE WHEN (2 * CAST(SUBSTRING(CreditCardNumber, LEN(CreditCardNumber) - 1 - number + 1, 1) AS INT)) > 9 THEN (2 * CAST(SUBSTRING(CreditCardNumber, LEN(CreditCardNumber) - 1 - number + 1, 1) AS INT)) - 9
+                                     ELSE (2 * CAST(SUBSTRING(CreditCardNumber, LEN(CreditCardNumber) - 1 - number + 1, 1) AS INT)) END
                             ELSE 
-                                CAST(SUBSTRING(CreditCardNumber, number, 1) AS INT) END
+                                CAST(SUBSTRING(CreditCardNumber, LEN(CreditCardNumber) - 1 - number + 1, 1) AS INT) END
                         ) % 10) = 0
                 THEN 'Valid Credit Card Number'
                 ELSE 'Invalid Credit Card Number' 
@@ -22,4 +22,6 @@ SELECT
         ELSE 'Invalid Credit Card Number'
     END AS ValidationResult
 FROM 
-    YourTableName;
+    YourTableName
+CROSS JOIN
+    (SELECT number FROM master.dbo.spt_values WHERE number BETWEEN 0 AND LEN(CreditCardNumber)) AS Numbers;
