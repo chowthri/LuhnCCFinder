@@ -1,0 +1,25 @@
+SELECT 
+    CreditCardNumber,
+    CASE 
+        WHEN LEN(CreditCardNumber) < 13 THEN 'Invalid Credit Card Number'
+        WHEN LEN(CreditCardNumber) > 19 THEN 'Invalid Credit Card Number'
+        WHEN CreditCardNumber NOT LIKE '%[^0-9]%' THEN
+            CASE 
+                WHEN 
+                    (
+                        (SUM(SUBSTRING(REVERSE(CreditCardNumber), 1, 1)) +
+                        SUM(CASE WHEN (LEN(CreditCardNumber) % 2 = 0 AND (LEN(CreditCardNumber) - 1) - number BETWEEN 0 AND LEN(CreditCardNumber) - 2) 
+                                 OR (LEN(CreditCardNumber) % 2 != 0 AND (LEN(CreditCardNumber) - 1) - number BETWEEN 0 AND LEN(CreditCardNumber) - 2) 
+                            THEN 
+                                CASE WHEN (2 * CAST(SUBSTRING(CreditCardNumber, number, 1) AS INT)) > 9 THEN (2 * CAST(SUBSTRING(CreditCardNumber, number, 1) AS INT)) - 9
+                                     ELSE (2 * CAST(SUBSTRING(CreditCardNumber, number, 1) AS INT)) END
+                            ELSE 
+                                CAST(SUBSTRING(CreditCardNumber, number, 1) AS INT) END
+                        ) % 10) = 0
+                THEN 'Valid Credit Card Number'
+                ELSE 'Invalid Credit Card Number' 
+            END
+        ELSE 'Invalid Credit Card Number'
+    END AS ValidationResult
+FROM 
+    YourTableName;
